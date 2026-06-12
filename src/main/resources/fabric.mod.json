@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "plaguesnoisycreepers",
+	"version": "${version}",
+	"name": "Plague's Noisy Creepers",
+	"description": "Add footstep and idle sounds to creepers!",
+	"authors": [
+		"Plague1337"
+	],
+	"contact": {
+		"sources": "https://github.com/PlagueTR/NoisyCreepers"
+	},
+	"license": "MIT",
+	"icon": "assets/plaguesnoisycreepers/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+          "space.plague.noisycreepers.Main"
+		],
+		"modmenu": [
+          "space.plague.noisycreepers.config.gui.ModMenuIntegration"
+		]
+	},
+	"mixins": [
+      "plaguesnoisycreepers.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.1",
+		"java": ">=25",
+        "fabric-api": "*"
+    },
+    "suggests": {
+      "modmenu": ">=18.0.0"
+    }
+}

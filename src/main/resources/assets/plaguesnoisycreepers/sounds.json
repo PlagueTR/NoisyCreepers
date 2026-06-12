@@ -1,0 +1,18 @@
+{
+  "entity.creeper.step": {
+    "sounds": [
+      "plaguesnoisycreepers:entity/creeper/step1",
+      "plaguesnoisycreepers:entity/creeper/step2",
+      "plaguesnoisycreepers:entity/creeper/step3",
+      "plaguesnoisycreepers:entity/creeper/step4"
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
+  },
+  "entity.creeper.ambient": {
+    "sounds": [
+      "plaguesnoisycreepers:entity/creeper/ambient1",
+      "plaguesnoisycreepers:entity/creeper/ambient2"
+    ],
+    "subtitle": "subtitle.entity.plaguesnoisycreepers.creeper.ambient"
+  }
+}
