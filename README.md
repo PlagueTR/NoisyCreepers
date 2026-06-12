@@ -20,7 +20,7 @@ The volume and frequency of the sounds can be customized, so you can make the cr
 
 Here is a little showcase!
 
-<video src="showcase/NoisyCreepers.mp4" controls = "controls" style="max-width:100%"></video>
+https://github.com/user-attachments/assets/a080062c-4230-48d7-8705-8f32229db858
 
 ![default settings](showcase/default-settings.png)
 
