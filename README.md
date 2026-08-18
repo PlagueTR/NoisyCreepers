@@ -53,41 +53,16 @@ If you're unsure whether this mod is allowed on a server, it is recommended that
 
 ## 🚀 Supported Versions
 
-| Minecraft |  Fabric   |   Quilt    |   Forge    |  NeoForge  |
-|:---------:|:---------:|:----------:|:----------:|:----------:|
-| **26.2**  | ✅(1.2.1) | ✅(1.2.1)⁵ |     ❌     | ✅(1.2.1)  |
-|  26.1.2   | ✅(1.2.1) | ✅(1.2.1)⁴ |     ❌     | ✅(1.2.1)  |
-|  26.1.1   | ✅(1.2.1) | ✅(1.2.1)⁴ |     ❌     | ✅(1.2.1)  |
-| **26.1**  | ✅(1.2.1) | ✅(1.2.1)⁴ |     ❌     | ✅(1.2.1)  |
-|  1.21.11  | ✅(1.2.1) | ✅(1.2.1)³ |     ❌     | ✅(1.2.1)  |
-|  1.21.10  | ✅(1.2.1) | ✅(1.2.1)  |     ❌     | ✅(1.2.1)  |
-|  1.21.9   | ✅(1.2.1) | ✅(1.2.1)  |     ❌     | ✅(1.2.1)² |
-|  1.21.8   | ✅(1.2.1) | ✅(1.2.1)  |     ❌     | ✅(1.2.1)  |
-|  1.21.7   | ✅(1.2.1) | ✅(1.2.1)  |     ❌     | ✅(1.2.1)  |
-|  1.21.6   | ✅(1.2.1) | ✅(1.2.1)  |     ❌     | ✅(1.2.1)  |
-|  1.21.5   | ✅(1.2.1) | ✅(1.2.1)  |     ❌     | ✅(1.2.1)  |
-|  1.21.4   | ✅(1.2.1) | ✅(1.2.1)  | ✅(1.2.1)¹ | ✅(1.2.1)  |
-|  1.21.3   | ✅(1.2.1) | ✅(1.2.1)  | ✅(1.2.1)  | ✅(1.2.1)  |
-|  1.21.2   | ✅(1.2.1) | ✅(1.2.1)  |     ❌     | ✅(1.2.1)  |
-|  1.21.1   | ✅(1.2.1) | ✅(1.2.1)  | ✅(1.2.1)  | ✅(1.2.1)  |
-| **1.21**  | ✅(1.2.1) | ✅(1.2.1)  | ✅(1.2.1)  | ✅(1.2.1)  |
-|  1.20.6   | ✅(1.2.1) | ✅(1.2.1)  | ✅(1.2.1)  | ✅(1.2.1)  |
-|  1.20.5   | ✅(1.2.1) | ✅(1.2.1)  |     ❌     | ✅(1.2.1)  |
-|  1.20.4   | ✅(1.2.1) | ✅(1.2.1)  | ✅(1.2.1)  | ✅(1.2.1)  |
-|  1.20.3   |    ❌     |     ❌     |     ❌     |     ❌     |
-|  1.20.2   | ✅(1.2.1) | ✅(1.2.1)  | ✅(1.2.1)  | ✅(1.2.1)  |
-|  1.20.1   | ✅(1.2.1) | ✅(1.2.1)  | ✅(1.2.1)  |     ❌     |
-| **1.20**  | ✅(1.2.1) | ✅(1.2.1)  | ✅(1.2.1)  |     ❌     |
+| Minecraft |  Fabric   |   Quilt   |   Forge   | NeoForge |
+|:---------:|:---------:|:---------:|:---------:|:--------:|
+|  26.1.2   | ✅(1.0.0) | ✅(1.0.0) |    ❌     |    ❌    |
+|  1.16.5   | ✅(1.1.0) | ✅(1.1.0) | ✅(1.1.0) |    ❌    |
 
 ✅ - Supported ⏳ - Planned ❌ - Not supported
 
-Notes:  
-Latest mod version is written in parentheses  
-¹: **1.21.4 [Forge]** users can use cloth config for 1.21.3 since there is no build of cloth config for 1.21.4 Forge  
-²: **1.21.9 [NeoForge]** users should use NeoForge 21.9.15-beta or below since cloth config causes a crash on NeoForge 21.9.16-beta upon opening the mods list  
-³: **1.21.11 [Quilt]** users should use Quilt 0.29.3-beta.1 or above since mod menu now requires Fabric 0.17.3  
-⁴: **From 26.1 to 26.1.2 [Quilt]** users should use Quilt 0.30.0-beta.4 or above since mod menu now requires Fabric 0.18.4  
-⁵: **From 26.2 [Quilt]** users should use Quilt 0.30.0-beta.8 or above for mod menu to work
+Notes:
+Latest mod version is written in parentheses   
+¹: **From 26.1 to 26.1.2 [Quilt]** users should use Quilt 0.30.0-beta.4 or above since mod menu now requires Fabric 0.18.4
 
 [fabric]: https://fabricmc.net
 [Fabric API]: https://modrinth.com/mod/fabric-api "Fabric API Modrinth page"

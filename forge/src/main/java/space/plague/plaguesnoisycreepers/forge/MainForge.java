@@ -30,6 +30,6 @@ public final class MainForge {
                 ((minecraft, screen) -> GeneralOptionsScreen.getConfigBuilder().build()
             ));
         }
-        
+
     }
 }
