@@ -61,7 +61,7 @@ If you're unsure whether this mod is allowed on a server, it is recommended that
 ✅ - Supported ⏳ - Planned ❌ - Not supported
 
 Notes:
-Latest mod version is written in parentheses   
+Latest mod version is written in parentheses
 ¹: **From 26.1 to 26.1.2 [Quilt]** users should use Quilt 0.30.0-beta.4 or above since mod menu now requires Fabric 0.18.4
 
 [fabric]: https://fabricmc.net
