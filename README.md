@@ -56,6 +56,8 @@ If you're unsure whether this mod is allowed on a server, it is recommended that
 | Minecraft |  Fabric   |   Quilt   |   Forge   | NeoForge |
 |:---------:|:---------:|:---------:|:---------:|:--------:|
 |  26.1.2   | ✅(1.0.0) | ✅(1.0.0) |    ❌     |    ❌    |
+|  1.17.1   | ✅(1.1.1) | ✅(1.1.1) | ✅(1.1.1) |    ❌    |
+| **1.17**  |    ❌     |    ❌     |    ❌     |    ❌    |
 |  1.16.5   | ✅(1.1.0) | ✅(1.1.0) | ✅(1.1.0) |    ❌    |
 
 ✅ - Supported ⏳ - Planned ❌ - Not supported
