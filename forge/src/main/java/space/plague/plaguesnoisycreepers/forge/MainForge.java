@@ -1,7 +1,7 @@
 package space.plague.plaguesnoisycreepers.forge;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.ConfigGuiHandler;
+import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -26,10 +26,10 @@ public final class MainForge {
         Sounds.register();
 
         if (ModList.get().isLoaded("cloth_config")) {
-            ModLoadingContext.get().registerExtensionPoint(ConfigGuiHandler.ConfigGuiFactory.class, () ->
-                new ConfigGuiHandler.ConfigGuiFactory(
-                (minecraft, screen) -> GeneralOptionsScreen.getConfigBuilder().build())
-            );
+            ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
+                new ConfigScreenHandler.ConfigScreenFactory(
+                    (minecraft, screen) -> GeneralOptionsScreen.getConfigBuilder().build()
+                ));
         }
 
     }

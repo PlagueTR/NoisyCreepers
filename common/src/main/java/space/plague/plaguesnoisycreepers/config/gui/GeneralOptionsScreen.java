@@ -5,8 +5,8 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 
-import net.minecraft.network.chat.TextComponent;
 import space.plague.plaguesnoisycreepers.Main;
 import space.plague.plaguesnoisycreepers.config.ModConfig;
 
@@ -21,41 +21,41 @@ public class GeneralOptionsScreen {
 
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(Minecraft.getInstance().screen)
-                .setTitle(new TextComponent("Plague's Noisy Creepers - General"));
+                .setTitle(Component.literal("Plague's Noisy Creepers - General"));
 
         builder.setSavingRunnable(Main::saveConfig);
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
 
-        ConfigCategory general = builder.getOrCreateCategory(new TextComponent("General"));
+        ConfigCategory general = builder.getOrCreateCategory(Component.literal("General"));
 
-        general.addEntry(entryBuilder.startBooleanToggle(new TextComponent("Enable Mod"), Main.getConfig().isEnableMod())
+        general.addEntry(entryBuilder.startBooleanToggle(Component.literal("Enable Mod"), Main.getConfig().isEnableMod())
                 .setDefaultValue(defaults.isEnableMod())
-                .setTooltip(new TextComponent("Enables the mod."))
+                .setTooltip(Component.literal("Enables the mod."))
                 .setSaveConsumer(newValue -> Main.getConfig().setEnableMod(newValue))
                 .build());
 
-        general.addEntry(entryBuilder.startBooleanToggle(new TextComponent("Enable Steps"), Main.getConfig().isEnableSteps())
+        general.addEntry(entryBuilder.startBooleanToggle(Component.literal("Enable Steps"), Main.getConfig().isEnableSteps())
                 .setDefaultValue(defaults.isEnableSteps())
-                .setTooltip(new TextComponent("Enables footstep sounds."))
+                .setTooltip(Component.literal("Enables footstep sounds."))
                 .setSaveConsumer(newValue -> Main.getConfig().setEnableSteps(newValue))
                 .build());
 
-        general.addEntry(entryBuilder.startIntSlider(new TextComponent("Steps volume"), (int)(Main.getConfig().getStepVolume() * 100), 0, 100)
+        general.addEntry(entryBuilder.startIntSlider(Component.literal("Steps volume"), (int)(Main.getConfig().getStepVolume() * 100), 0, 100)
                 .setDefaultValue((int)(defaults.getStepVolume() * 100))
-                .setTooltip(new TextComponent("Sets the volume level for creeper footstep sounds."))
+                .setTooltip(Component.literal("Sets the volume level for creeper footstep sounds."))
                 .setSaveConsumer(newValue -> Main.getConfig().setStepVolume(((float)newValue)/100.0F))
                 .build());
 
-        general.addEntry(entryBuilder.startBooleanToggle(new TextComponent("Enable Ambient"), Main.getConfig().isEnableAmbient())
+        general.addEntry(entryBuilder.startBooleanToggle(Component.literal("Enable Ambient"), Main.getConfig().isEnableAmbient())
                 .setDefaultValue(defaults.isEnableAmbient())
-                .setTooltip(new TextComponent("Enables ambient sounds."))
+                .setTooltip(Component.literal("Enables ambient sounds."))
                 .setSaveConsumer(newValue -> Main.getConfig().setEnableAmbient(newValue))
                 .build());
 
-        general.addEntry(entryBuilder.startIntSlider(new TextComponent("Ambient volume"), (int)(Main.getConfig().getAmbientVolume() * 100), 0, 100)
+        general.addEntry(entryBuilder.startIntSlider(Component.literal("Ambient volume"), (int)(Main.getConfig().getAmbientVolume() * 100), 0, 100)
                 .setDefaultValue((int)(defaults.getAmbientVolume() * 100))
-                .setTooltip(new TextComponent("Sets the volume level for creeper ambient sounds."))
+                .setTooltip(Component.literal("Sets the volume level for creeper ambient sounds."))
                 .setSaveConsumer(newValue -> Main.getConfig().setAmbientVolume(((float)newValue)/100.0F))
                 .build());
 
@@ -82,9 +82,9 @@ public class GeneralOptionsScreen {
             frequencies_is.put(frequencies_i[i], frequencies_s[i]);
         }
 
-        general.addEntry(entryBuilder.startSelector(new TextComponent("Ambient Frequency"), frequencies_s, frequencies_is.get(Main.getConfig().getAmbientFrequency()))
+        general.addEntry(entryBuilder.startSelector(Component.literal("Ambient Frequency"), frequencies_s, frequencies_is.get(Main.getConfig().getAmbientFrequency()))
                 .setDefaultValue(frequencies_is.get(defaults.getAmbientFrequency()))
-                .setTooltip(new TextComponent("Sets the frequency for creeper ambient sounds."))
+                .setTooltip(Component.literal("Sets the frequency for creeper ambient sounds."))
                 .setSaveConsumer(newValue -> Main.getConfig().setAmbientFrequency(frequencies_si.get(newValue)))
                 .build());
 
