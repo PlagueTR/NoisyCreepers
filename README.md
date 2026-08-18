@@ -10,8 +10,8 @@ A client-side mod that adds footstep and idle sounds to creepers!
 
 This is a client-side mod made for [Fabric modloader][fabric] that allows users to add footstep and idle sounds to creepers.
 
-Have you ever been caught off guard by a creeper on a mining trip and thought that creepers were just a little too good at sneaking?
-With this mod, creepers will have a harder time creeping up on you!
+Have you ever been caught off guard by a creeper on a mining trip and thought that creepers were just a little too good at sneaking?<br>
+With this mod, creepers will have a harder time creeping up on you!<br>
 The Noisy Creepers mod adds footstep and idle sounds to creepers, making them a little less stealthy and a little easier to notice.
 
 The volume and frequency of the sounds can be customized, so you can make the creepers as noticeable, or as sneaky as you want them to be.
@@ -61,7 +61,7 @@ If you're unsure whether this mod is allowed on a server, it is recommended that
 ✅ - Supported ⏳ - Planned ❌ - Not supported
 
 Notes:
-Latest mod version is written in parentheses
+Latest mod version is written in parentheses<br>
 ¹: **From 26.1 to 26.1.2 [Quilt]** users should use Quilt 0.30.0-beta.4 or above since mod menu now requires Fabric 0.18.4
 
 [fabric]: https://fabricmc.net
