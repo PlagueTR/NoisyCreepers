@@ -1,10 +1,10 @@
 package space.plague.plaguesnoisycreepers.neoforge;
 
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.ConfigScreenHandler;
 
@@ -14,7 +14,7 @@ import space.plague.plaguesnoisycreepers.neoforge.sounds.Sounds;
 
 @Mod(Main.MOD_ID)
 public final class MainNeoForge {
-    public MainNeoForge() {
+    public MainNeoForge(IEventBus eventBus) {
 
         if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
             return;
@@ -22,7 +22,7 @@ public final class MainNeoForge {
 
         Main.init();
 
-        Sounds.SOUNDS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        Sounds.SOUNDS.register(eventBus);
         Sounds.register();
 
         if (ModList.get().isLoaded("cloth_config")) {

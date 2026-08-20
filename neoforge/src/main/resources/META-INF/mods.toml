@@ -14,14 +14,14 @@ logoFile = "icon.png"
 
 [[dependencies.plaguesnoisycreepers]]
 modId = "neoforge"
-mandatory = true
+type = "required"
 versionRange = "${neoforge_loader_version}"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.plaguesnoisycreepers]]
 modId = "minecraft"
-mandatory = true
+type = "required"
 versionRange = "[${minecraft_version}]"
 ordering = "NONE"
 side = "BOTH"
