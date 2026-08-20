@@ -6,7 +6,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.client.ConfigScreenHandler;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 import space.plague.plaguesnoisycreepers.Main;
 import space.plague.plaguesnoisycreepers.config.gui.GeneralOptionsScreen;
@@ -27,10 +27,8 @@ public final class MainNeoForge {
 
         if (ModList.get().isLoaded("cloth_config")) {
             ModLoadingContext.get().registerExtensionPoint(
-                ConfigScreenHandler.ConfigScreenFactory.class, () ->
-                new ConfigScreenHandler.ConfigScreenFactory(
-                    (minecraftClient, screen) -> GeneralOptionsScreen.getConfigBuilder().build()
-                ));
+                IConfigScreenFactory.class, () ->
+                    (minecraft, screen) -> GeneralOptionsScreen.getConfigBuilder().build());
         }
     }
 }
