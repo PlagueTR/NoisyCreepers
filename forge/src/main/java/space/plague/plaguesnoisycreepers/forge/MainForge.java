@@ -14,7 +14,7 @@ import space.plague.plaguesnoisycreepers.forge.sounds.Sounds;
 
 @Mod(Main.MOD_ID)
 public final class MainForge {
-    public MainForge() {
+    public MainForge(FMLJavaModLoadingContext context) {
 
         if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
             return;
@@ -22,11 +22,11 @@ public final class MainForge {
 
         Main.init();
 
-        Sounds.SOUNDS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        Sounds.SOUNDS.register(context.getModEventBus());
         Sounds.register();
 
         if (ModList.get().isLoaded("cloth_config")) {
-            ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
+            context.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
                 new ConfigScreenHandler.ConfigScreenFactory(
                     (minecraft, screen) -> GeneralOptionsScreen.getConfigBuilder().build()
                 ));
