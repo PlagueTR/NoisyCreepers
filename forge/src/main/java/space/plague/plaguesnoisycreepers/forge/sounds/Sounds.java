@@ -23,9 +23,9 @@ public class Sounds {
 
     public static RegistryObject<SoundEvent> registerSound(String name) {
 
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("plaguesnoisycreepers", name);
+        ResourceLocation id = new ResourceLocation("plaguesnoisycreepers", name);
 
-        return SOUNDS.register(name, () -> new SoundEvent(id));
+        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(id));
     }
 
 }
