@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.6
+
+- Minecraft 1.19.1 support
+
 ## 1.1.5
 
 - Minecraft 1.19 support
