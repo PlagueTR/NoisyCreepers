@@ -19,7 +19,7 @@ public class Sounds {
 
     private static SoundEvent registerSound(String name) {
 
-        ResourceLocation id = new ResourceLocation("plaguesnoisycreepers", name);
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("plaguesnoisycreepers", name);
 
         return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
     }
