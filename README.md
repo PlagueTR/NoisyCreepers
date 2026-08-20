@@ -1,4 +1,4 @@
-# Retouch Brush
+# Plague's Noisy Creepers
 
 [![License](https://img.shields.io/badge/License-MIT%20License-green?style=for-the-badge)](https://raw.githubusercontent.com/PlagueTR/NoisyCreepers/main/LICENSE)
 ![Environment](https://img.shields.io/badge/Environment-Client-blue?style=for-the-badge)
