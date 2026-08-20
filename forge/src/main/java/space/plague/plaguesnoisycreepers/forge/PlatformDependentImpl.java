@@ -1,7 +1,9 @@
 package space.plague.plaguesnoisycreepers.forge;
 
 import net.minecraft.sounds.SoundEvent;
+
 import net.minecraftforge.fml.loading.FMLPaths;
+
 import space.plague.plaguesnoisycreepers.forge.sounds.Sounds;
 
 import java.nio.file.Path;
