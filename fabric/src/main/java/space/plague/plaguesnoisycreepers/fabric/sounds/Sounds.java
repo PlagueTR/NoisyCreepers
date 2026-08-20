@@ -1,6 +1,7 @@
 package space.plague.plaguesnoisycreepers.fabric.sounds;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 
@@ -20,7 +21,7 @@ public class Sounds {
 
         ResourceLocation id = new ResourceLocation("plaguesnoisycreepers", name);
 
-        return Registry.register(Registry.SOUND_EVENT, id, new SoundEvent(id));
+        return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
     }
 
 }
