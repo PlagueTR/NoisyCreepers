@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.22
+
+- Minecraft 1.21.6 support
+
 ## 1.1.21
 
 - Minecraft 1.21.5 support
