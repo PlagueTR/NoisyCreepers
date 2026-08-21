@@ -16,7 +16,7 @@ import space.plague.plaguesnoisycreepers.neoforge.sounds.Sounds;
 public final class MainNeoForge {
     public MainNeoForge(IEventBus eventBus) {
 
-        if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
+        if (FMLEnvironment.getDist() == Dist.DEDICATED_SERVER) {
             return;
         }
 
