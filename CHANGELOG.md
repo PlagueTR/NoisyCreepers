@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.27
+
+- Minecraft 1.21.11 support
+
 ## 1.1.26
 
 - Minecraft 1.21.10 support

@@ -1,7 +1,7 @@
 package space.plague.plaguesnoisycreepers.neoforge.sounds;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -24,7 +24,7 @@ public class Sounds {
 
     public static Supplier<SoundEvent> registerSound(String name) {
 
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("plaguesnoisycreepers", name);
+        Identifier id = Identifier.fromNamespaceAndPath("plaguesnoisycreepers", name);
 
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(id));
     }
