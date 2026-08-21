@@ -94,11 +94,10 @@ If you're unsure whether this mod is allowed on a server, it is recommended that
 
 Notes:
 - Latest mod version is written in parentheses
-- ¹: **1.21.4 [Forge]** users can use cloth config for 1.21.3 since there is no build of cloth config for 1.21.4 Forge
-- ²: **1.21.9 [NeoForge]** users should use NeoForge 21.9.15-beta or below since cloth config causes a crash on NeoForge 21.9.16-beta upon opening the mods list
-- ³: **1.21.11 [Quilt]** users should use Quilt 0.29.3-beta.1 or above since mod menu now requires Fabric 0.17.3
-- ⁴: **From 26.1 to 26.1.2 [Quilt]** users should use Quilt 0.30.0-beta.4 or above since mod menu now requires Fabric 0.18.4
-- ⁵: **From 26.2 [Quilt]** users should use Quilt 0.30.0-beta.8 or above for mod menu to work
+- ¹: **1.21.9 [NeoForge]** users should use NeoForge 21.9.15-beta or below since cloth config causes a crash on NeoForge 21.9.16-beta upon opening the mods list
+- ²: **1.21.11 [Quilt]** users should use Quilt 0.29.3-beta.1 or above since mod menu now requires Fabric 0.17.3
+- ³: **From 26.1 to 26.1.2 [Quilt]** users should use Quilt 0.30.0-beta.4 or above since mod menu now requires Fabric 0.18.4
+- ⁴: **From 26.2 [Quilt]** users should use Quilt 0.30.0-beta.8 or above for mod menu to work
 
 [fabric]: https://fabricmc.net
 [Fabric API]: https://modrinth.com/mod/fabric-api "Fabric API Modrinth page"
