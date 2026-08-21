@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.31
+
+- Minecraft 26.2 support
+
 ## 1.1.30
 
 - Minecraft 26.1.2 support
