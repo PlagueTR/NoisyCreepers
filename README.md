@@ -55,6 +55,7 @@ If you're unsure whether this mod is allowed on a server, it is recommended that
 
 | Minecraft |   Fabric   |    Quilt    |   Forge    |  NeoForge   |
 |:---------:|:----------:|:-----------:|:----------:|:-----------:|
+| **26.3**  | ✅(1.1.32) | ✅(1.1.32)⁵ |     ❌     | ✅(1.1.32)  |
 | **26.2**  | ✅(1.1.31) | ✅(1.1.31)⁴ |     ❌     | ✅(1.1.31)  |
 |  26.1.2   | ✅(1.1.30) | ✅(1.1.30)³ |     ❌     | ✅(1.1.30)  |
 |  26.1.1   | ✅(1.1.29) | ✅(1.1.29)³ |     ❌     | ✅(1.1.29)  |
@@ -98,6 +99,7 @@ Notes:
 - ²: **1.21.11 [Quilt]** users should use Quilt 0.29.3-beta.1 or above since mod menu now requires Fabric 0.17.3
 - ³: **From 26.1 to 26.1.2 [Quilt]** users should use Quilt 0.30.0-beta.4 or above since mod menu now requires Fabric 0.18.4
 - ⁴: **From 26.2 [Quilt]** users should use Quilt 0.30.0-beta.8 or above for mod menu to work
+- ⁵: **From 26.3 [Quilt]** users should use Quilt 0.30.2-beta.1 or above for the mod to work
 
 [fabric]: https://fabricmc.net
 [Fabric API]: https://modrinth.com/mod/fabric-api "Fabric API Modrinth page"
