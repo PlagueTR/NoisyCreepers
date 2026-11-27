@@ -1,6 +1,6 @@
-## 1.2.30
+## 1.2.31
 
-- Minecraft 26.1.2 support
+- Minecraft 26.2 support
 - The ambient volume setting now works on every version and no longer changes the creeper hurt sound
 - The Fabric version now only loads on the Minecraft version it was made for
 - Opening the config screen from Mod Menu without Cloth Config installed no longer crashes the game
