@@ -320,6 +320,10 @@ configure(subprojects.findAll { it.name in ['forge', 'neoforge'] }) {
 
     def accessWidenerName = "${rootProject.mod_id}.accesswidener"
     loom {
+        runs.configureEach {
+            property('terminal.ansi', 'true')
+        }
+
         if (project.name == 'neoforge') {
             neoForge {
                 convertAccessWideners(tasks.named(rootProject.modJarTaskName), accessWidenerName)
