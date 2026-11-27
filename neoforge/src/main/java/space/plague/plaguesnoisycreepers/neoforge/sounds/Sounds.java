@@ -1,18 +1,18 @@
 package space.plague.plaguesnoisycreepers.neoforge.sounds;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import space.plague.plaguesnoisycreepers.Main;
+import space.plague.plaguesnoisycreepers.VersionCompat;
 
 import java.util.function.Supplier;
 
 public class Sounds {
 
-    public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, "plaguesnoisycreepers");
+    public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, Main.MOD_ID);
 
     public static final Supplier<SoundEvent> CREEPER_STEP = registerSound("entity.creeper.step");
 
@@ -22,11 +22,8 @@ public class Sounds {
         Main.LOGGER.info("[" + Main.MOD_NAME + "] Registering Sound Events...");
     }
 
-    public static Supplier<SoundEvent> registerSound(String name) {
-
-        Identifier id = Identifier.fromNamespaceAndPath("plaguesnoisycreepers", name);
-
-        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(id));
+    private static Supplier<SoundEvent> registerSound(String name) {
+        return SOUNDS.register(name, () -> VersionCompat.createSound(name));
     }
 
 }
