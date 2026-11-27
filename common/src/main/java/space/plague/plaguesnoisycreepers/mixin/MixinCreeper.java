@@ -8,21 +8,27 @@ import space.plague.plaguesnoisycreepers.config.ModConfig;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(Creeper.class)
-public class MixinCreeper {
+public abstract class MixinCreeper extends Monster {
 
-    @Unique
+    protected MixinCreeper(EntityType<? extends Monster> entityType, Level level) {
+        super(entityType, level);
+    }
+
+    @Override
     public int getAmbientSoundInterval() {
         return Main.getConfig().getAmbientFrequency();
     }
 
-    @Unique
+    @Override
     protected @Nullable SoundEvent getAmbientSound() {
 
         ModConfig mc = Main.getConfig();
@@ -40,21 +46,15 @@ public class MixinCreeper {
         return PlatformDependent.getCreeperAmbient();
     }
 
-    @Unique
+    @Override
     public void playAmbientSound() {
         SoundEvent sound = this.getAmbientSound();
         if (sound != null) {
-            Creeper creeper = (Creeper) (Object) this;
-            creeper.playSound(sound, Main.getConfig().getAmbientVolume() * 2.0F, creeper.getVoicePitch());
+            this.playSound(sound, Main.getConfig().getAmbientVolume() * 2.0F, this.getVoicePitch());
         }
     }
 
-    @Unique
-    protected SoundEvent getStepSound() {
-        return PlatformDependent.getCreeperStep();
-    }
-
-    @Unique
+    @Override
     protected void playStepSound(final BlockPos pos, final BlockState blockState) {
 
         ModConfig mc = Main.getConfig();
@@ -69,8 +69,7 @@ public class MixinCreeper {
             return;
         }
 
-        Creeper creeper = (Creeper) (Object) this;
-        creeper.playSound(this.getStepSound(), mc.getStepVolume() * 0.3F, 1.0F);
+        this.playSound(PlatformDependent.getCreeperStep(), mc.getStepVolume() * 0.3F, 1.0F);
 
     }
 
