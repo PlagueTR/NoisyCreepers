@@ -1,3 +1,3 @@
-## 1.2.49
+## 1.2.50
 
 - Fixed a major problem that prevented mod from working properly on versions older than 26.x
