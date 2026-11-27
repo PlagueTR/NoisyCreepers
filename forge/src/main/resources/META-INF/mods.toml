@@ -1,27 +1,43 @@
 modLoader = "javafml"
-loaderVersion = "${forge_loader_version}"
+loaderVersion = "[${forge_major},)"
 license = "${mod_license}"
 
 [[mods]]
-modId = "plaguesnoisycreepers"
+modId = "${mod_id}"
 version = "${mod_version}"
 displayName = "${mod_name}"
 authors = "${mod_author}"
 description = '''
-${mod_desc}
+${mod_description}
 '''
 logoFile = "icon.png"
 
-[[dependencies.plaguesnoisycreepers]]
+[[dependencies.${mod_id}]]
 modId = "forge"
 mandatory = true
-versionRange = "${forge_loader_version}"
+versionRange = "[${forge_major},)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.plaguesnoisycreepers]]
+[[dependencies.${mod_id}]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[${minecraft_version}]"
 ordering = "NONE"
 side = "BOTH"
+<% if (architectury_api_version) { %>
+[[dependencies.${mod_id}]]
+modId = "architectury"
+mandatory = true
+versionRange = "[${architectury_api_version},)"
+ordering = "AFTER"
+side = "BOTH"
+<% } %>
+<% if (cloth_config_version) { %>
+[[dependencies.${mod_id}]]
+modId = "${cloth_config_id}"
+mandatory = false
+versionRange = "[${cloth_config_version},)"
+ordering = "NONE"
+side = "CLIENT"
+<% } %>

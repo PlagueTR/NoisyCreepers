@@ -1,42 +1,50 @@
 architectury {
-    common rootProject.enabled_platforms.split(',')
+    common(rootProject.activePlatforms)
+}
+
+def accessWidenerFile = file("src/main/resources/${rootProject.mod_id}.accesswidener")
+
+if (rootProject.unobfuscated) {
+    def officialAccessWidener = rootProject.file(".gradle/accessWidener/${accessWidenerFile.name}")
+    officialAccessWidener.parentFile.mkdirs()
+    officialAccessWidener.text = accessWidenerFile.getText('UTF-8').replaceFirst(/^(accessWidener\s+v\d+\s+)named\b/, '$1official')
+    accessWidenerFile = officialAccessWidener
 }
 
 loom {
-    accessWidenerPath = project(":common").file("src/main/resources/${project.archives_name}.accesswidener")
+    accessWidenerPath = accessWidenerFile
 }
 
 dependencies {
-    if (rootProject.architectury_loom_id == 'dev.architectury.loom-no-remap') {
-        implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    "${rootProject.modConfiguration}" "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
-        implementation("me.shedaniel.cloth:cloth-config-fabric:${rootProject.common_cloth_config_version}")
+    def clothConfigVersion = rootProject.dependencyVersion('common', 'cloth_config_version')
+    if (clothConfigVersion) {
+        "${rootProject.modConfiguration}"("me.shedaniel.cloth:cloth-config-fabric:${clothConfigVersion}") {
+            exclude group: 'net.fabricmc.fabric-api'
+        }
     }
-    else {
-        modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
-        modImplementation("me.shedaniel.cloth:cloth-config-fabric:${rootProject.common_cloth_config_version}")
+    if (rootProject.includeArchitecturyApi) {
+        def architecturyVersion = rootProject.dependencyVersion('common', 'architectury_api_version')
+        if (architecturyVersion) {
+            def group = rootProject.findProperty('architectury_api_group') ?: 'dev.architectury'
+            "${rootProject.modConfiguration}" "${group}:architectury:${architecturyVersion}"
+        }
     }
 }
 
-if (rootProject.architectury_loom_id == 'dev.architectury.loom-no-remap') {
-    configurations {
-        shadowCommon
+processResources {
+    def properties = [mixin_compatibility: rootProject.modProperties.mixin_compatibility]
+    inputs.properties(properties)
+
+    filesMatching("${rootProject.mod_id}.mixins.json") {
+        expand(properties)
     }
 
-    jar {
-        archiveClassifier = "raw"
-    }
-
-    java {
-        withSourcesJar()
-    }
-
-    shadowJar {
-        dependsOn(jar)
-        from(zipTree(jar.archiveFile))
-
-        configurations = [project.configurations.shadowCommon]
-        archiveClassifier = null
+    if (rootProject.unobfuscated) {
+        filesMatching("${rootProject.mod_id}.accesswidener") {
+            filter { String line -> line.replaceFirst(/^(accessWidener\s+v\d+\s+)named\b/, '$1official') }
+        }
     }
 }

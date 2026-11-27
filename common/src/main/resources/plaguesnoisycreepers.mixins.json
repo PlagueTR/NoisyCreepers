@@ -1,13 +1,12 @@
 {
   "required": true,
   "package": "space.plague.plaguesnoisycreepers.mixin",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "${mixin_compatibility}",
   "minVersion": "0.8",
   "client": [
     "MixinCreeper"
   ],
-  "mixins": [
-  ],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   }

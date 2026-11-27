@@ -2,45 +2,48 @@ pluginManagement {
     repositories {
         maven { url = 'https://maven.fabricmc.net/' }
         maven { url = 'https://maven.architectury.dev/' }
-        maven { url = 'https://files.minecraftforge.net/maven/' }
-        maven { url = 'https://maven.neoforged.net/releases' }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://maven.neoforged.net/releases/' }
         gradlePluginPortal()
     }
 }
 
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
 rootProject.name = providers.gradleProperty('archives_name').get()
 
-include 'common'
+if (gradle.startParameter.taskNames.any { it.replaceFirst('^:', '') == 'updateTemplate' }) {
+    rootProject.buildFileName = 'gradle/template-update.gradle'
+    return
+}
 
-def targetMinecraftStr = providers.gradleProperty('target_minecraft_version').get()
-
-def versionFile = new File("versions/${targetMinecraftStr}.properties")
+def targetVersion = providers.gradleProperty('target_minecraft_version').get()
+def versionFile = file("versions/${targetVersion}.properties")
 if (!versionFile.exists()) {
-    throw new GradleException("Minecraft version profile configuration not found: ${versionFile.absolutePath}")
+    def available = file('versions').listFiles()*.name.findAll { it.endsWith('.properties') }*.replace('.properties', '').sort()
+    throw new GradleException("No version profile for Minecraft ${targetVersion}. Available: ${available.join(', ')}")
 }
 
-def versionProps = new Properties()
-versionFile.withInputStream { stream -> versionProps.load(stream) }
+def versionProperties = new Properties()
+versionFile.withReader('UTF-8') { versionProperties.load(it) }
 
-versionProps.each { key, value ->
-    gradle.ext[key] = value
+def supportedPlatforms = versionProperties.getProperty('supported_loaders').split(',')*.trim()
+def enabledPlatforms = providers.gradleProperty('enabled_platforms').get().split(',')*.trim()*.toLowerCase()
+def activePlatforms = enabledPlatforms.findAll { it in supportedPlatforms }
+
+if (activePlatforms.isEmpty()) {
+    throw new GradleException("None of the enabled platforms ${enabledPlatforms} are supported on Minecraft ${targetVersion} (supported: ${supportedPlatforms})")
 }
 
-def platformsProp = providers.gradleProperty('enabled_platforms').get()
-def enabledPlatforms = platformsProp.split(',').collect { it.trim().toLowerCase() }
-
-def supportedPlatformsProp = gradle.ext['supported_loaders']
-def supportedPlatforms = supportedPlatformsProp.split(',').collect { it.trim().toLowerCase() }
-
-def activePlatforms = enabledPlatforms.intersect(supportedPlatforms)
-gradle.ext['active_platforms'] = activePlatforms
-
-if (activePlatforms.contains('fabric')) {
-    include 'fabric'
+def skippedPlatforms = enabledPlatforms - activePlatforms
+if (!skippedPlatforms.isEmpty()) {
+    logger.lifecycle("Minecraft ${targetVersion} does not support ${skippedPlatforms.join(', ')}, skipping")
 }
-if (activePlatforms.contains('forge')) {
-    include 'forge'
-}
-if (activePlatforms.contains('neoforge')) {
-    include 'neoforge'
-}
+
+gradle.ext.versionProperties = versionProperties
+gradle.ext.activePlatforms = activePlatforms
+
+include 'common'
+activePlatforms.each { include it }

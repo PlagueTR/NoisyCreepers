@@ -1,0 +1,45 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "${mod_license}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "${mod_author}"
+description = '''
+${mod_description}
+'''
+logoFile = "icon.png"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+${neoforge_required}
+versionRange = "[${neoforge_major},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+${neoforge_required}
+versionRange = "[${minecraft_version}]"
+ordering = "NONE"
+side = "BOTH"
+<% if (architectury_api_version) { %>
+[[dependencies.${mod_id}]]
+modId = "architectury"
+${neoforge_required}
+versionRange = "[${architectury_api_version},)"
+ordering = "AFTER"
+side = "BOTH"
+<% } %>
+<% if (cloth_config_version) { %>
+[[dependencies.${mod_id}]]
+modId = "${cloth_config_id}"
+${neoforge_optional}
+versionRange = "[${cloth_config_version},)"
+ordering = "NONE"
+side = "CLIENT"
+<% } %>
+[[mixins]]
+config = "${mod_id}.mixins.json"

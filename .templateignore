@@ -1,0 +1,10 @@
+README.md
+CHANGELOG.md
+LICENSE
+mod_resources/**
+showcase/**
+**/src/main/java/**
+**/src/variants/**
+**/src/main/resources/assets/**
+**/src/main/resources/*.png
+project_setup.py

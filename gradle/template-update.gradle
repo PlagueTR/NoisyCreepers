@@ -1,0 +1,585 @@
+import java.nio.charset.StandardCharsets
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.attribute.PosixFilePermission
+import java.security.MessageDigest
+
+class TemplateGit {
+    final File dir
+
+    TemplateGit(File dir) {
+        this.dir = dir
+    }
+
+    Map run(List<String> args, byte[] input = null, boolean check = true) {
+        def process = new ProcessBuilder(['git'] + args).directory(dir).redirectErrorStream(false).start()
+        def stdout = new ByteArrayOutputStream()
+        def stderr = new ByteArrayOutputStream()
+        def outThread = Thread.start { process.inputStream.transferTo(stdout) }
+        def errThread = Thread.start { process.errorStream.transferTo(stderr) }
+        if (input != null) {
+            process.outputStream.write(input)
+        }
+        process.outputStream.close()
+        def code = process.waitFor()
+        outThread.join()
+        errThread.join()
+        if (check && code != 0) {
+            throw new GradleException("git ${args.join(' ')} failed: ${stderr.toString('UTF-8').trim()}")
+        }
+        return [code: code, out: stdout.toByteArray(), err: stderr.toString('UTF-8')]
+    }
+
+    String text(List<String> args) {
+        return new String(run(args).out as byte[], StandardCharsets.UTF_8).trim()
+    }
+
+    Map<String, Map> tree(String commit) {
+        def entries = [:]
+        new String(run(['ls-tree', '-r', '-z', commit]).out as byte[], StandardCharsets.UTF_8).split('\u0000').each { line ->
+            if (line) {
+                def (meta, path) = line.split('\t', 2)
+                def (mode, type, sha) = meta.split(' ')
+                if (type == 'blob') {
+                    entries[path] = [mode: mode, sha: sha]
+                }
+            }
+        }
+        return entries
+    }
+
+    private final Map<String, byte[]> blobs = [:]
+
+    byte[] blob(String sha) {
+        return blobs.computeIfAbsent(sha) { run(['cat-file', 'blob', it]).out as byte[] }
+    }
+}
+
+class TemplateConsole {
+    private final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))
+    boolean closed = false
+
+    String ask(String question) {
+        if (closed) {
+            return null
+        }
+        System.out.print(question)
+        System.out.flush()
+        def line = reader.readLine()
+        if (line == null) {
+            closed = true
+            println ''
+        }
+        return line?.trim()
+    }
+}
+
+def templateProperties = file('template.properties')
+def templateIgnore = file('.templateignore')
+
+tasks.register('updateTemplate') {
+    group = 'template'
+    description = 'Merges the latest Architectury template into this project, asking on conflicts'
+    notCompatibleWithConfigurationCache('Interactive task')
+
+    doLast {
+        def root = rootProject.projectDir
+        def git = new TemplateGit(root)
+        def console = new TemplateConsole()
+
+        def state = new Properties()
+        if (templateProperties.exists()) {
+            templateProperties.withReader('UTF-8') { state.load(it) }
+        }
+
+        def repository = findProperty('templateRepo') ?: state.getProperty('template_repository', 'https://github.com/PlagueTR/ArchitecturyTemplate.git')
+        def ref = findProperty('templateRef') ?: state.getProperty('template_branch', 'main')
+        def mode = (findProperty('templateConflicts') ?: 'ask').toString()
+        def dryRun = findProperty('dryRun') != null
+        if (!(mode in ['ask', 'merge', 'template', 'mine'])) {
+            throw new GradleException("templateConflicts must be ask, merge, template or mine (got ${mode})")
+        }
+
+        if (git.run(['rev-parse', '--is-inside-work-tree'], null, false).code != 0) {
+            throw new GradleException('updateTemplate needs this project to be a git repository')
+        }
+        def dirty = git.text(['status', '--porcelain'])
+        if (dirty && findProperty('force') == null && !dryRun) {
+            throw new GradleException("Commit or stash your changes first so the update can be reviewed and undone with git (or pass -Pforce):\n${dirty}")
+        }
+
+        logger.lifecycle("Fetching ${repository} (${ref})")
+        git.run(['fetch', '--quiet', '--no-tags', repository, "+${ref}:refs/template/latest".toString()], null, false).with {
+            if (it.code != 0) {
+                git.run(['fetch', '--quiet', '--no-tags', repository, ref])
+                git.run(['update-ref', 'refs/template/latest', 'FETCH_HEAD'])
+            }
+        }
+        def latest = git.text(['rev-parse', 'refs/template/latest'])
+
+        def latestTree = latest ? git.tree(latest) : [:]
+
+        def ignoreText = templateIgnore.exists() ? templateIgnore.getText('UTF-8') : null
+        def adoptedIgnore = false
+        if (ignoreText == null && latestTree['.templateignore']) {
+            ignoreText = new String(git.blob(latestTree['.templateignore'].sha), StandardCharsets.UTF_8)
+            adoptedIgnore = true
+            if (!dryRun) {
+                templateIgnore.text = ignoreText
+            }
+        }
+        def ignorePatterns = (ignoreText ?: '').readLines()
+            .collect { it.replaceFirst(/#.*$/, '').trim() }
+            .findAll()
+        ignorePatterns += ['template.properties', '.templateignore', '.env']
+        def matchers = ignorePatterns.collect { pattern ->
+            def glob = pattern.endsWith('/') ? "${pattern}**" : pattern
+            FileSystems.default.getPathMatcher("glob:${glob}")
+        }
+        def ignored = { String path -> matchers.any { it.matches(Path.of(path)) } }
+
+        def readProperties = { byte[] bytes ->
+            def properties = new Properties()
+            if (bytes != null) {
+                properties.load(new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8))
+            }
+            properties
+        }
+        def localProperties = readProperties(file('gradle.properties').bytes)
+        def localId = localProperties.getProperty('mod_id') ?: localProperties.getProperty('archives_name')
+        def localGroup = localProperties.getProperty('maven_group')
+
+        def substitutionsFor = { Map tree ->
+            def entry = tree['gradle.properties']
+            def properties = readProperties(entry ? git.blob(entry.sha) : null)
+            def templateId = properties.getProperty('mod_id') ?: properties.getProperty('archives_name') ?: 'example_mod'
+            def templateGroup = properties.getProperty('maven_group') ?: 'com.example'
+            def replacements = [
+                ["${templateGroup}.${templateId}", "${localGroup}.${localId}"],
+                ["${templateGroup.replace('.', '/')}/${templateId}", "${localGroup.replace('.', '/')}/${localId}"],
+                [templateId, localId],
+                [templateGroup, localGroup],
+            ]
+            replacements.collect { pair -> pair*.toString() }.findAll { it[0] != it[1] }
+        }
+        def applySubstitutions = { String text, List replacements ->
+            replacements.inject(text) { result, pair -> result.replace(pair[0], pair[1]) }
+        }
+        def isText = { byte[] bytes -> bytes.length < 8000000 && !(0..<Math.min(bytes.length, 8000)).any { bytes[it] == 0 } }
+        def contentFor = { Map tree, String path, List replacements ->
+            def entry = tree[path]
+            if (entry == null) {
+                return null
+            }
+            def bytes = git.blob(entry.sha)
+            return isText(bytes) && path != 'gradle/template-update.gradle' ? applySubstitutions(new String(bytes, StandardCharsets.UTF_8), replacements).getBytes(StandardCharsets.UTF_8) : bytes
+        }
+        def localPathFor = { String path, List replacements -> applySubstitutions(path, replacements) }
+        def readLocal = { String path ->
+            def target = new File(root, path)
+            if (!target.isFile()) {
+                return null
+            }
+            def bytes = target.bytes
+            if (!isText(bytes) || !(bytes as List).contains((byte) 13)) {
+                return bytes
+            }
+            def sha = new String(git.run(['hash-object', '-w', '--stdin', "--path=${path}".toString()], bytes).out as byte[], StandardCharsets.UTF_8).trim()
+            return git.blob(sha)
+        }
+        def toWorktree = { String path, byte[] bytes ->
+            if (!isText(bytes)) {
+                return bytes
+            }
+            def sha = new String(git.run(['hash-object', '-w', '--stdin', '--no-filters'], bytes).out as byte[], StandardCharsets.UTF_8).trim()
+            return git.run(['cat-file', '--filters', "--path=${path}".toString(), sha]).out as byte[]
+        }
+        def digest = { byte[] bytes -> bytes == null ? null : MessageDigest.getInstance('SHA-1').digest(bytes).encodeHex().toString() }
+
+        def latestReplacements = substitutionsFor(latestTree)
+
+        def base = findProperty('templateBase') ?: state.getProperty('template_commit')
+        if (base && git.run(['cat-file', '-e', "${base}^{commit}".toString()], null, false).code != 0) {
+            logger.warn("Recorded template commit ${base} is not part of ${repository} ${ref}, detecting it again")
+            base = null
+        }
+        if (!base) {
+            logger.lifecycle('No template.properties found, looking for the template commit this project is closest to...')
+            def localDigests = [:]
+            def best = null
+            def bestScore = -1
+            git.text(['rev-list', '--max-count=300', 'refs/template/latest']).readLines().each { commit ->
+                def tree = git.tree(commit)
+                def replacements = substitutionsFor(tree)
+                def score = tree.keySet().findAll { !ignored(it) && it != 'gradle/template-update.gradle' }.count { path ->
+                    def localPath = localPathFor(path, replacements)
+                    def localDigest = localDigests.computeIfAbsent(localPath) { digest(readLocal(it)) }
+                    localDigest != null && localDigest == digest(contentFor(tree, path, replacements))
+                }
+                if (score > bestScore) {
+                    bestScore = score
+                    best = commit
+                }
+            }
+            if (best != null && bestScore > 0) {
+                base = best
+                logger.lifecycle("Closest template commit: ${git.text(['log', '-1', '--format=%h %s (%cs)', base])} (${bestScore} identical files)")
+            } else {
+                logger.lifecycle('No matching template commit found, every differing file will be treated as a conflict')
+            }
+        }
+
+        if (base == latest) {
+            logger.lifecycle("Already up to date with ${git.text(['log', '-1', '--format=%h %s', latest])}")
+            return
+        }
+
+        def baseTree = base ? git.tree(base) : [:]
+        def baseReplacements = base ? substitutionsFor(baseTree) : latestReplacements
+
+        def summary = [updated: [], added: adoptedIgnore ? ['.templateignore'] : [], deleted: [], merged: [], kept: [], conflicts: [], pending: [], renamed: [], dropped: [], removedKept: [], moved: []]
+        def applyAll = null
+
+        def propertyPattern = ~/^\s*([^#!\s=:][^=:\s]*)\s*[=:]\s*(.*?)\s*$/
+        def propertyValues = { byte[] bytes ->
+            def values = [:]
+            if (bytes == null) {
+                return values
+            }
+            new String(bytes, StandardCharsets.UTF_8).readLines().each { line ->
+                def match = propertyPattern.matcher(line)
+                if (match.matches()) {
+                    values[match.group(1)] = match.group(2)
+                }
+            }
+            values
+        }
+        def movedKeys = [:]
+        def noteMovedKeys = { String path, byte[] bytes ->
+            if (!path.endsWith('.properties') || path == 'gradle.properties') {
+                return
+            }
+            def before = propertyValues(readLocal(path))
+            def after = propertyValues(bytes)
+            before.findAll { !after.containsKey(it.key) }.each { key, value ->
+                movedKeys.computeIfAbsent(key) { [:] }.computeIfAbsent(value) { [] } << path
+            }
+        }
+        def writeFile = { String path, byte[] bytes, String templateMode ->
+            noteMovedKeys(path, bytes)
+            if (dryRun) {
+                return
+            }
+            def target = new File(root, path)
+            target.parentFile.mkdirs()
+            target.bytes = toWorktree(path, bytes)
+            if (templateMode == '100755') {
+                try {
+                    def permissions = Files.getPosixFilePermissions(target.toPath())
+                    permissions.addAll([PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_EXECUTE, PosixFilePermission.OTHERS_EXECUTE])
+                    Files.setPosixFilePermissions(target.toPath(), permissions)
+                } catch (UnsupportedOperationException ignore) {
+                }
+            }
+        }
+        def deleteFile = { String path ->
+            if (!dryRun) {
+                new File(root, path).delete()
+            }
+        }
+        def mergeFile = { byte[] mine, byte[] baseBytes, byte[] theirs ->
+            def temp = Files.createTempDirectory('template-merge').toFile()
+            try {
+                def mineFile = new File(temp, 'mine')
+                def baseFile = new File(temp, 'base')
+                def theirsFile = new File(temp, 'theirs')
+                mineFile.bytes = mine ?: new byte[0]
+                baseFile.bytes = baseBytes ?: new byte[0]
+                theirsFile.bytes = theirs ?: new byte[0]
+                def result = git.run(['merge-file', '-p', '-L', 'yours', '-L', 'template (previous)', '-L', 'template (latest)',
+                                      mineFile.path, baseFile.path, theirsFile.path], null, false)
+                if (result.code < 0) {
+                    throw new GradleException("git merge-file failed: ${result.err}")
+                }
+                return [bytes: result.out, conflicts: result.code]
+            } finally {
+                temp.deleteDir()
+            }
+        }
+        def showDiff = { String path, byte[] mine, byte[] theirs ->
+            def temp = Files.createTempDirectory('template-diff').toFile()
+            try {
+                def name = new File(path).name
+                def mineFile = new File(temp, "yours/${name}")
+                def theirsFile = new File(temp, "template/${name}")
+                [mineFile, theirsFile]*.parentFile*.mkdirs()
+                mineFile.bytes = mine ?: new byte[0]
+                theirsFile.bytes = theirs ?: new byte[0]
+                def result = new TemplateGit(temp).run(['diff', '--no-index', '--no-color', "yours/${name}".toString(), "template/${name}".toString()], null, false)
+                println new String(result.out as byte[], StandardCharsets.UTF_8)
+            } finally {
+                temp.deleteDir()
+            }
+        }
+        def askProperty = { String path, String key, String mine, String theirs ->
+            if (dryRun) {
+                return 'pending'
+            }
+            def choice = [template: 'template', mine: 'mine', merge: 'mine'][applyAll ?: mode]
+            while (choice == null) {
+                def answer = console.ask("\n${path}: both you and the template changed ${key}\n  yours:    ${mine ?: '(removed)'}\n  template: ${theirs ?: '(removed)'}\n  [t]emplate, [k]eep yours > ")
+                if (answer == null) {
+                    mode = 'merge'
+                    choice = 'mine'
+                } else {
+                    choice = [t: 'template', k: 'mine'][answer.toLowerCase()]
+                }
+            }
+            return choice
+        }
+        def projectKeys = ['mod_id', 'mod_name', 'mod_description', 'mod_author', 'mod_sources', 'mod_license', 'mod_version',
+                           'mod_environment', 'maven_group', 'archives_name', 'target_minecraft_version', 'enabled_platforms',
+                           'include_architectury_api', 'release_type', 'repo_owner', 'repo_name', 'repo_branch', 'modrinth_id', 'curseforge_id']
+        def renamedKeys = [repo_repo: 'repo_name', minecraft_java_version: 'java_version',
+                           common_cloth_config_version: 'cloth_config_version', fabric_mod_menu_version: 'mod_menu_version']
+        def directoryOf = { String path -> path.contains('/') ? path.substring(0, path.lastIndexOf('/')) : '' }
+        def propertyKeysIn = { Map tree, String directory ->
+            tree.findAll { it.key.endsWith('.properties') && directoryOf(it.key) == directory }
+                .collectMany { propertyValues(git.blob(it.value.sha)).keySet() as List } as Set
+        }
+        def obsoleteKeys = [:].withDefault { String directory -> propertyKeysIn(baseTree, directory) - propertyKeysIn(latestTree, directory) }
+        def mergeProperties = { String path, byte[] mine, byte[] baseBytes, byte[] theirs ->
+            def mineValues = propertyValues(mine)
+            def baseValues = propertyValues(baseBytes)
+            def theirValues = propertyValues(theirs)
+            def renamed = []
+            renamedKeys.each { oldKey, newKey ->
+                if (mineValues.containsKey(oldKey) && !mineValues.containsKey(newKey) && theirValues.containsKey(newKey) && !theirValues.containsKey(oldKey)) {
+                    mineValues[newKey] = mineValues.remove(oldKey)
+                    if (baseValues.containsKey(oldKey) && !baseValues.containsKey(newKey)) {
+                        baseValues[newKey] = baseValues.remove(oldKey)
+                    }
+                    renamed << "${oldKey} -> ${newKey}".toString()
+                }
+            }
+            if (path == 'gradle.properties' && !mineValues.containsKey('mod_id') && mineValues.containsKey('archives_name') && theirValues.containsKey('mod_id')) {
+                mineValues.mod_id = mineValues.archives_name
+            }
+            def keptKeys = []
+            def pendingKeys = []
+            def droppedKeys = []
+            def resolve = { String key ->
+                def yours = mineValues[key]
+                def original = baseValues[key]
+                def template = theirValues[key]
+                if (path == 'gradle.properties' && key in projectKeys && yours != null) {
+                    return yours
+                }
+                if (baseBytes == null && template == null && key in obsoleteKeys[directoryOf(path)]) {
+                    droppedKeys << key
+                    return null
+                }
+                if (yours == template || yours == original) {
+                    return template
+                }
+                if (template == original) {
+                    return yours
+                }
+                def choice = askProperty(path, key, yours, template)
+                if (choice == 'pending') {
+                    pendingKeys << key
+                    return yours
+                }
+                if (choice == 'mine') {
+                    keptKeys << key
+                    return yours
+                }
+                return template
+            }
+            def lines = []
+            new String(theirs, StandardCharsets.UTF_8).readLines().each { line ->
+                def match = propertyPattern.matcher(line)
+                if (!match.matches()) {
+                    lines << line
+                    return
+                }
+                def key = match.group(1)
+                def value = resolve(key)
+                if (value != null) {
+                    lines << (value == match.group(2) ? line : line.substring(0, match.start(2)) + value)
+                }
+            }
+            def extra = mineValues.keySet().findAll { !theirValues.containsKey(it) }.findResults { key ->
+                def value = resolve(key)
+                value == null ? null : "${key} = ${value}".toString()
+            }
+            if (extra) {
+                if (lines && lines.last()) {
+                    lines << ''
+                }
+                lines.addAll(extra)
+            }
+            return [bytes: (lines.join('\n') + '\n').getBytes(StandardCharsets.UTF_8), kept: keptKeys, pending: pendingKeys, renamed: renamed, dropped: droppedKeys]
+        }
+        def decide = { String path, String reason, byte[] mine, byte[] theirs, boolean canMerge ->
+            if (dryRun) {
+                summary.pending << path
+                return 'pending'
+            }
+            if (applyAll != null) {
+                return applyAll
+            }
+            if (mode != 'ask') {
+                return mode
+            }
+            def options = canMerge ? '[t]emplate, [k]eep yours, [m]erge with markers, [d]iff' : '[t]emplate, [k]eep yours, [d]iff'
+            while (true) {
+                def answer = console.ask("\n${path}: ${reason}\n  ${options} (uppercase = all remaining) > ")
+                if (answer == null) {
+                    logger.lifecycle('No input available, falling back to -PtemplateConflicts=merge')
+                    mode = 'merge'
+                    return 'merge'
+                }
+                def choice = [t: 'template', k: 'mine', m: 'merge', d: 'diff'][answer.toLowerCase()]
+                if (choice == 'diff') {
+                    showDiff(path, mine, theirs)
+                } else if (choice != null && (choice != 'merge' || canMerge)) {
+                    if (answer != answer.toLowerCase()) {
+                        applyAll = choice
+                    }
+                    return choice
+                }
+            }
+        }
+
+        def paths = (baseTree.keySet() + latestTree.keySet()).findAll { !ignored(it) }.sort()
+        paths.each { path ->
+            def localPath = localPathFor(path, latestReplacements)
+            def baseBytes = contentFor(baseTree, path, baseReplacements)
+            def theirs = contentFor(latestTree, path, latestReplacements)
+            def mine = readLocal(localPath)
+            def templateMode = latestTree[path]?.mode
+
+            def same = { byte[] a, byte[] b -> a == null ? b == null : (b != null && Arrays.equals(a, b)) }
+            if (same(mine, theirs) || (base && same(baseBytes, theirs))) {
+                return
+            }
+            if (theirs == null) {
+                if (mine == null) {
+                    return
+                }
+                if (same(mine, baseBytes)) {
+                    deleteFile(localPath)
+                    summary.deleted << localPath
+                    return
+                }
+                def choice = decide(localPath, 'removed from the template, but you changed it', mine, null, false)
+                if (choice == 'template') {
+                    deleteFile(localPath)
+                    summary.deleted << localPath
+                } else if (choice != 'pending') {
+                    summary.removedKept << localPath
+                }
+                return
+            }
+            if (mine == null) {
+                if (baseBytes == null) {
+                    writeFile(localPath, theirs, templateMode)
+                    summary.added << localPath
+                    return
+                }
+                def choice = decide(localPath, 'you deleted it, but the template changed it', null, theirs, false)
+                if (choice == 'template') {
+                    writeFile(localPath, theirs, templateMode)
+                    summary.added << localPath
+                } else if (choice != 'pending') {
+                    summary.kept << localPath
+                }
+                return
+            }
+            if (base && same(mine, baseBytes)) {
+                writeFile(localPath, theirs, templateMode)
+                summary.updated << localPath
+                return
+            }
+
+            def text = isText(mine) && isText(theirs) && (baseBytes == null || isText(baseBytes))
+            def merged = text ? mergeFile(mine, baseBytes, theirs) : null
+            if (merged != null && merged.conflicts == 0 && baseBytes != null) {
+                writeFile(localPath, merged.bytes, templateMode)
+                summary.merged << localPath
+                return
+            }
+
+            if (text && localPath.endsWith('.properties')) {
+                def properties = mergeProperties(localPath, mine, baseBytes, theirs)
+                writeFile(localPath, properties.bytes, templateMode)
+                summary.merged << localPath
+                properties.kept.each { summary.kept << "${localPath}: ${it}".toString() }
+                properties.pending.each { summary.pending << "${localPath}: ${it}".toString() }
+                properties.renamed.each { summary.renamed << "${localPath}: ${it}".toString() }
+                if (properties.dropped) {
+                    summary.dropped << "${localPath}: ${properties.dropped.join(', ')}".toString()
+                }
+                return
+            }
+
+            def reason = baseBytes == null ? 'differs from the template and has no common base' : (merged ? "both you and the template changed it (${merged.conflicts} conflicting hunks)" : 'both you and the template changed this binary file')
+            def choice = decide(localPath, reason, mine, theirs, text)
+            switch (choice) {
+                case 'template':
+                    writeFile(localPath, theirs, templateMode)
+                    summary.updated << localPath
+                    break
+                case 'merge':
+                    if (merged == null) {
+                        summary.kept << localPath
+                        break
+                    }
+                    writeFile(localPath, merged.bytes, templateMode)
+                    summary.conflicts << localPath
+                    break
+                case 'pending':
+                    break
+                default:
+                    summary.kept << localPath
+            }
+        }
+
+        if (!dryRun) {
+            state.setProperty('template_repository', repository.toString())
+            state.setProperty('template_branch', ref.toString())
+            state.setProperty('template_commit', latest)
+            templateProperties.withWriter('UTF-8') { writer ->
+                writer.write("template_repository=${repository}\ntemplate_branch=${ref}\ntemplate_commit=${latest}\n")
+            }
+        }
+
+        def rootValues = propertyValues(dryRun ? contentFor(latestTree, 'gradle.properties', latestReplacements) : readLocal('gradle.properties'))
+        movedKeys.each { key, values ->
+            def rootValue = rootValues[key]
+            values.findAll { rootValue != null && it.key != rootValue }.each { value, files ->
+                def where = files.size() > 3 ? "${files.size()} files" : files.join(', ')
+                summary.moved << "${key} = ${value} in ${where}, now ${rootValue} from gradle.properties".toString()
+            }
+        }
+
+        logger.lifecycle("\n${dryRun ? 'Dry run, nothing was written. ' : ''}Template ${base ? git.text(['log', '-1', '--format=%h', base]) : '(unknown)'} -> ${git.text(['log', '-1', '--format=%h %s', latest])}")
+        [updated: 'Updated', added: 'Added', deleted: 'Deleted', merged: 'Merged cleanly', kept: 'Kept yours', conflicts: 'Conflict markers, resolve by hand', pending: 'Would ask about', renamed: 'Renamed keys', dropped: 'Removed keys the template no longer uses',
+         moved: 'Values that now come from gradle.properties, set them there or in a profile if you need them',
+         removedKept: 'Removed from the template, kept because you changed them (delete them unless you still need them)'].each { key, label ->
+            if (summary[key]) {
+                logger.lifecycle("${label}:\n  ${summary[key].join('\n  ')}")
+            }
+        }
+        if (summary.values().every { it.isEmpty() }) {
+            logger.lifecycle('Nothing to change')
+        }
+        if (summary.conflicts) {
+            logger.lifecycle('\nSearch for <<<<<<< in the files above, then review everything with git diff before committing.')
+        } else if (!dryRun) {
+            logger.lifecycle('\nReview the changes with git diff before committing.')
+        }
+    }
+}

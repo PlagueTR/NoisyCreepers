@@ -4,7 +4,7 @@
 build/
 out/
 classes/
-gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.jar
 
 # fabric & architectury
 
@@ -40,3 +40,6 @@ replay_*.log
 # macos
 
 *.DS_Store
+# secrets
+
+.env
