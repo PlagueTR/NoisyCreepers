@@ -2,6 +2,10 @@ package space.plague.plaguesnoisycreepers.config;
 
 public class ModConfig {
 
+    public static final int[] AMBIENT_FREQUENCIES = {80, 120, 160, 240, 360};
+
+    private static final int MIN_AMBIENT_FREQUENCY = 20;
+
     private boolean enableMod;
 
     private boolean enableSteps;
@@ -25,7 +29,36 @@ public class ModConfig {
 
         this.ambientVolume = 0.5F;
 
-        this.ambientFrequency = 80;
+        this.ambientFrequency = AMBIENT_FREQUENCIES[0];
+    }
+
+    public void sanitize() {
+        ModConfig defaults = new ModConfig();
+
+        this.stepVolume = clampVolume(this.stepVolume, defaults.stepVolume);
+
+        this.ambientVolume = clampVolume(this.ambientVolume, defaults.ambientVolume);
+
+        if (this.ambientFrequency < MIN_AMBIENT_FREQUENCY) {
+            this.ambientFrequency = defaults.ambientFrequency;
+        }
+    }
+
+    private static float clampVolume(float volume, float fallback) {
+        if (Float.isNaN(volume) || Float.isInfinite(volume)) {
+            return fallback;
+        }
+        return Math.max(0.0F, Math.min(1.0F, volume));
+    }
+
+    public static int nearestAmbientFrequency(int frequency) {
+        int nearest = AMBIENT_FREQUENCIES[0];
+        for (int preset : AMBIENT_FREQUENCIES) {
+            if (Math.abs(preset - frequency) < Math.abs(nearest - frequency)) {
+                nearest = preset;
+            }
+        }
+        return nearest;
     }
 
     public boolean isEnableMod() {

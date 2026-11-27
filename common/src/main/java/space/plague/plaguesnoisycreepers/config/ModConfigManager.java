@@ -1,82 +1,70 @@
 package space.plague.plaguesnoisycreepers.config;
 
-import java.io.*;
-
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 
 import space.plague.plaguesnoisycreepers.Main;
 import space.plague.plaguesnoisycreepers.PlatformDependent;
 
-public class ModConfigManager {
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-    private static File configFile;
-    private static ModConfig config;
-    private static Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).setPrettyPrinting().create();;
+public final class ModConfigManager {
 
-    private static void prepareConfigFile() {
-        if (ModConfigManager.configFile == null){
-            ModConfigManager.configFile = new File(PlatformDependent.getConfigDirectory().toString(), Main.MOD_ID + ".json");
-        }
+    private static final Gson GSON = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .setPrettyPrinting()
+            .create();
+
+    private static ModConfig config = new ModConfig();
+
+    private ModConfigManager() {
     }
 
-    public static void initializeConfig() {
-        if (ModConfigManager.config != null){
-            return;
-        }
-        ModConfigManager.config = new ModConfig();
-        load();
-    }
-
-    public static void save() {
-        prepareConfigFile();
-        final String jsonString = gson.toJson(config);
-        try {
-            final FileWriter fileWriter =  new FileWriter(ModConfigManager.configFile);
-            try {
-                fileWriter.write(jsonString);
-                fileWriter.close();
-            }
-            catch (Throwable t) {
-                try {
-                    fileWriter.close();
-                }
-                catch (Throwable exception) {
-                    t.addSuppressed(exception);
-                }
-                throw t;
-            }
-        }
-        catch (IOException e) {
-            Main.LOGGER.warn("[" + Main.MOD_NAME + "] Couldn't save config file!", e);
-        }
-    }
-
-    private static void load() {
-        prepareConfigFile();
-        try {
-            if (!ModConfigManager.configFile.exists()) {
-                save();
-            }
-            else {
-                final BufferedReader br = new BufferedReader(new FileReader(ModConfigManager.configFile));
-                final ModConfig parsed = gson.fromJson(br, ModConfig.class);
-                if (parsed != null) {
-                    ModConfigManager.config = parsed;
-                }
-            }
-        }
-        catch (FileNotFoundException e) {
-            Main.LOGGER.warn("[" + Main.MOD_NAME + "] Couldn't load config file!", e);
-        }
+    private static Path getConfigFile() {
+        return PlatformDependent.getConfigDirectory().resolve(Main.MOD_ID + ".json");
     }
 
     public static ModConfig getConfig() {
-        if (ModConfigManager.config == null) {
-            ModConfigManager.config = new ModConfig();
+        return config;
+    }
+
+    public static void load() {
+        Path configFile = getConfigFile();
+
+        if (Files.exists(configFile)) {
+            try (Reader reader = Files.newBufferedReader(configFile, StandardCharsets.UTF_8)) {
+                ModConfig parsed = GSON.fromJson(reader, ModConfig.class);
+                if (parsed != null) {
+                    config = parsed;
+                }
+            } catch (IOException | JsonParseException e) {
+                Main.LOGGER.warn("[" + Main.MOD_NAME + "] Couldn't load config file " + configFile + ", using defaults", e);
+                config = new ModConfig();
+            }
         }
-        return ModConfigManager.config;
+
+        config.sanitize();
+        save();
+    }
+
+    public static void save() {
+        Path configFile = getConfigFile();
+
+        try {
+            Files.createDirectories(configFile.getParent());
+            try (Writer writer = Files.newBufferedWriter(configFile, StandardCharsets.UTF_8)) {
+                GSON.toJson(config, writer);
+            }
+        } catch (IOException e) {
+            Main.LOGGER.warn("[" + Main.MOD_NAME + "] Couldn't save config file " + configFile, e);
+        }
     }
 
 }

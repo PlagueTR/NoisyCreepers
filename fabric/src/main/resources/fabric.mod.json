@@ -27,7 +27,7 @@
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
-    "minecraft": "~${minecraft_version}",
+    "minecraft": "${minecraft_version}",
     "java": ">=${java_version}"<% if (architectury_api_version) { %>,
     "architectury": ">=${architectury_api_version}"<% } %>
   },

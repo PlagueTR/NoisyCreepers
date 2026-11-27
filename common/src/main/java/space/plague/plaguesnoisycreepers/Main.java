@@ -12,13 +12,16 @@ public final class Main {
     public static final String MOD_NAME = "Plague's Noisy Creepers";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
+    private Main() {
+    }
+
     public static void init() {
 
         LOGGER.info("[" + MOD_NAME + "] Loading...");
 
-        ModConfigManager.initializeConfig();
+        ModConfigManager.load();
 
-        LOGGER.info("[" + MOD_NAME +"] All done!");
+        LOGGER.info("[" + MOD_NAME + "] All done!");
 
     }
 

@@ -8,7 +8,7 @@ A client-side mod that adds footstep and idle sounds to creepers!
 
 ## 📖 What is this mod?
 
-This is a client-side mod made for [Fabric modloader][fabric] that allows users to add footstep and idle sounds to creepers.
+This is a client-side mod made for [Fabric][fabric], [Quilt][quilt], [Forge][forge] and [NeoForge][neoforge] that allows users to add footstep and idle sounds to creepers.
 
 Have you ever been caught off guard by a creeper on a mining trip and thought that creepers were just a little too good at sneaking?<br>
 With this mod, creepers will have a harder time creeping up on you!<br>
@@ -34,9 +34,10 @@ https://www.youtube.com/watch?v=AMdMk54kuwA
 
 Using this mod is very simple!
 
-Put the jar file in your mods folder; you also need to put the [Fabric API] jar file in your mods folder, and you are good to go!
+Put the jar file for your mod loader in your mods folder, and you are good to go! No other mods are required.
 
-If you wish to be able to access the settings of the mod within the game; you will also need to put [ModMenu] and [Cloth Config API] in your mods folder.
+If you wish to be able to access the settings of the mod within the game; you will also need to put [Cloth Config API] in your mods folder.
+On Fabric and Quilt you will also need [ModMenu] to open the settings, on Forge and NeoForge the settings can be opened from the mods list.
 You can also edit the configuration file found in config folder manually if you wish to do so.
 
 ## 📖 Compatibility
@@ -45,7 +46,7 @@ This mod should be compatible with almost every mod, as it only adds client-side
 
 ## 🌐 Multiplayer Servers
 
-This mod is entirely client-side and does not require installation on the server. It should work on virtually any multiplayer server, provided that the server allows Fabric clients to join.
+This mod is entirely client-side and does not require installation on the server. It should work on virtually any multiplayer server, provided that the server allows modded clients to join.
 
 However, because the mod makes creepers easier to hear and therefore easier to detect, some players or server communities may consider it  to provide a gameplay advantage. While the mod does not modify gameplay mechanics, entity behavior, or network traffic, it maybe viewed similarly to accessibility or awareness enhancing mods.
 
@@ -55,41 +56,41 @@ If you're unsure whether this mod is allowed on a server, it is recommended that
 
 | Minecraft |   Fabric   |    Quilt    |   Forge    |  NeoForge   |
 |:---------:|:----------:|:-----------:|:----------:|:-----------:|
-| **26.3**  | ✅(1.1.32) | ✅(1.1.32)⁵ |     ❌     | ✅(1.1.32)  |
-| **26.2**  | ✅(1.1.31) | ✅(1.1.31)⁴ |     ❌     | ✅(1.1.31)  |
-|  26.1.2   | ✅(1.1.30) | ✅(1.1.30)³ |     ❌     | ✅(1.1.30)  |
-|  26.1.1   | ✅(1.1.29) | ✅(1.1.29)³ |     ❌     | ✅(1.1.29)  |
-| **26.1**  | ✅(1.1.28) | ✅(1.1.28)³ |     ❌     | ✅(1.1.28)  |
-|  1.21.11  | ✅(1.1.27) | ✅(1.1.27)² |     ❌     | ✅(1.1.27)  |
-|  1.21.10  | ✅(1.1.26) | ✅(1.1.26)  |     ❌     | ✅(1.1.26)  |
-|  1.21.9   | ✅(1.1.25) | ✅(1.1.25)  |     ❌     | ✅(1.1.25)¹ |
-|  1.21.8   | ✅(1.1.24) | ✅(1.1.24)  |     ❌     | ✅(1.1.24)  |
-|  1.21.7   | ✅(1.1.23) | ✅(1.1.23)  |     ❌     | ✅(1.1.23)  |
-|  1.21.6   | ✅(1.1.22) | ✅(1.1.22)  |     ❌     | ✅(1.1.22)  |
-|  1.21.5   | ✅(1.1.21) | ✅(1.1.21)  |     ❌     | ✅(1.1.21)  |
-|  1.21.4   | ✅(1.1.20) | ✅(1.1.20)  |     ❌     | ✅(1.1.20)  |
-|  1.21.3   | ✅(1.1.19) | ✅(1.1.19)  |     ❌     | ✅(1.1.19)  |
-|  1.21.2   | ✅(1.1.18) | ✅(1.1.18)  |     ❌     | ✅(1.1.18)  |
-|  1.21.1   | ✅(1.1.17) | ✅(1.1.17)  |     ❌     | ✅(1.1.17)  |
-| **1.21**  | ✅(1.1.16) | ✅(1.1.16)  |     ❌     | ✅(1.1.16)  |
-|  1.20.6   | ✅(1.1.15) | ✅(1.1.15)  |     ❌     | ✅(1.1.15)  |
-|  1.20.5   | ✅(1.1.14) | ✅(1.1.14)  |     ❌     | ✅(1.1.14)  |
-|  1.20.4   | ✅(1.1.13) | ✅(1.1.13)  |     ❌     | ✅(1.1.13)  |
+| **26.3**  | ✅(1.2.32) | ✅(1.2.32)⁵ |     ❌     | ✅(1.2.32)  |
+| **26.2**  | ✅(1.2.31) | ✅(1.2.31)⁴ |     ❌     | ✅(1.2.31)  |
+|  26.1.2   | ✅(1.2.30) | ✅(1.2.30)³ |     ❌     | ✅(1.2.30)  |
+|  26.1.1   | ✅(1.2.29) | ✅(1.2.29)³ |     ❌     | ✅(1.2.29)  |
+| **26.1**  | ✅(1.2.28) | ✅(1.2.28)³ |     ❌     | ✅(1.2.28)  |
+|  1.21.11  | ✅(1.2.27) | ✅(1.2.27)² |     ❌     | ✅(1.2.27)  |
+|  1.21.10  | ✅(1.2.26) | ✅(1.2.26)  |     ❌     | ✅(1.2.26)  |
+|  1.21.9   | ✅(1.2.25) | ✅(1.2.25)  |     ❌     | ✅(1.2.25)¹ |
+|  1.21.8   | ✅(1.2.24) | ✅(1.2.24)  |     ❌     | ✅(1.2.24)  |
+|  1.21.7   | ✅(1.2.23) | ✅(1.2.23)  |     ❌     | ✅(1.2.23)  |
+|  1.21.6   | ✅(1.2.22) | ✅(1.2.22)  |     ❌     | ✅(1.2.22)  |
+|  1.21.5   | ✅(1.2.21) | ✅(1.2.21)  |     ❌     | ✅(1.2.21)  |
+|  1.21.4   | ✅(1.2.20) | ✅(1.2.20)  |     ❌     | ✅(1.2.20)  |
+|  1.21.3   | ✅(1.2.19) | ✅(1.2.19)  |     ❌     | ✅(1.2.19)  |
+|  1.21.2   | ✅(1.2.18) | ✅(1.2.18)  |     ❌     | ✅(1.2.18)  |
+|  1.21.1   | ✅(1.2.17) | ✅(1.2.17)  |     ❌     | ✅(1.2.17)  |
+| **1.21**  | ✅(1.2.16) | ✅(1.2.16)  |     ❌     | ✅(1.2.16)  |
+|  1.20.6   | ✅(1.2.15) | ✅(1.2.15)  |     ❌     | ✅(1.2.15)  |
+|  1.20.5   | ✅(1.2.14) | ✅(1.2.14)  |     ❌     | ✅(1.2.14)  |
+|  1.20.4   | ✅(1.2.13) | ✅(1.2.13)  |     ❌     | ✅(1.2.13)  |
 |  1.20.3   |     ❌     |     ❌      |     ❌     |     ❌      |
-|  1.20.2   | ✅(1.1.12) | ✅(1.1.12)  | ✅(1.1.12) | ✅(1.1.12)  |
-|  1.20.1   | ✅(1.1.11) | ✅(1.1.11)  | ✅(1.1.11) |     ❌      |
-| **1.20**  | ✅(1.1.10) | ✅(1.1.10)  | ✅(1.1.10) |     ❌      |
-|  1.19.4   | ✅(1.1.9)  |  ✅(1.1.9)  | ✅(1.1.9)  |     ❌      |
-|  1.19.3   | ✅(1.1.8)  |  ✅(1.1.8)  | ✅(1.1.8)  |     ❌      |
-|  1.19.2   | ✅(1.1.7)  |  ✅(1.1.7)  | ✅(1.1.7)  |     ❌      |
-|  1.19.1   | ✅(1.1.6)  |  ✅(1.1.6)  | ✅(1.1.6)  |     ❌      |
-| **1.19**  | ✅(1.1.5)  |  ✅(1.1.5)  | ✅(1.1.5)  |     ❌      |
-|  1.18.2   | ✅(1.1.4)  |  ✅(1.1.4)  | ✅(1.1.4)  |     ❌      |
-|  1.18.1   | ✅(1.1.3)  |  ✅(1.1.3)  | ✅(1.1.3)  |     ❌      |
-| **1.18**  | ✅(1.1.2)  |  ✅(1.1.2)  | ✅(1.1.2)  |     ❌      |
-|  1.17.1   | ✅(1.1.1)  |  ✅(1.1.1)  | ✅(1.1.1)  |     ❌      |
+|  1.20.2   | ✅(1.2.12) | ✅(1.2.12)  | ✅(1.2.12) | ✅(1.2.12)  |
+|  1.20.1   | ✅(1.2.11) | ✅(1.2.11)  | ✅(1.2.11) |     ❌      |
+| **1.20**  | ✅(1.2.10) | ✅(1.2.10)  | ✅(1.2.10) |     ❌      |
+|  1.19.4   | ✅(1.2.9)  |  ✅(1.2.9)  | ✅(1.2.9)  |     ❌      |
+|  1.19.3   | ✅(1.2.8)  |  ✅(1.2.8)  | ✅(1.2.8)  |     ❌      |
+|  1.19.2   | ✅(1.2.7)  |  ✅(1.2.7)  | ✅(1.2.7)  |     ❌      |
+|  1.19.1   | ✅(1.2.6)  |  ✅(1.2.6)  | ✅(1.2.6)  |     ❌      |
+| **1.19**  | ✅(1.2.5)  |  ✅(1.2.5)  | ✅(1.2.5)  |     ❌      |
+|  1.18.2   | ✅(1.2.4)  |  ✅(1.2.4)  | ✅(1.2.4)  |     ❌      |
+|  1.18.1   | ✅(1.2.3)  |  ✅(1.2.3)  | ✅(1.2.3)  |     ❌      |
+| **1.18**  | ✅(1.2.2)  |  ✅(1.2.2)  | ✅(1.2.2)  |     ❌      |
+|  1.17.1   | ✅(1.2.1)  |  ✅(1.2.1)  | ✅(1.2.1)  |     ❌      |
 | **1.17**  |     ❌     |     ❌      |     ❌     |     ❌      |
-|  1.16.5   | ✅(1.1.0)  |  ✅(1.1.0)  | ✅(1.1.0)  |     ❌      |
+|  1.16.5   | ✅(1.2.0)  |  ✅(1.2.0)  | ✅(1.2.0)  |     ❌      |
 
 ✅ - Supported ⏳ - Planned ❌ - Not supported
 
@@ -102,6 +103,8 @@ Notes:
 - ⁵: **From 26.3 [Quilt]** users should use Quilt 0.30.2-beta.1 or above for the mod to work
 
 [fabric]: https://fabricmc.net
-[Fabric API]: https://modrinth.com/mod/fabric-api "Fabric API Modrinth page"
+[quilt]: https://quiltmc.org
+[forge]: https://minecraftforge.net
+[neoforge]: https://neoforged.net
 [ModMenu]: https://modrinth.com/mod/modmenu "ModMenu Modrinth page"
 [Cloth Config API]: https://modrinth.com/mod/cloth-config "Cloth Config API Modrinth page"

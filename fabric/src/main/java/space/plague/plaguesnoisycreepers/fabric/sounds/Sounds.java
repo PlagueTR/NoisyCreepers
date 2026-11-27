@@ -1,27 +1,18 @@
 package space.plague.plaguesnoisycreepers.fabric.sounds;
 
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 
 import space.plague.plaguesnoisycreepers.Main;
+import space.plague.plaguesnoisycreepers.VersionCompat;
 
 public class Sounds {
 
-    public static final SoundEvent CREEPER_STEP = registerSound("entity.creeper.step");
+    public static final SoundEvent CREEPER_STEP = VersionCompat.registerSound("entity.creeper.step");
 
-    public static final SoundEvent CREEPER_AMBIENT = registerSound("entity.creeper.ambient");
+    public static final SoundEvent CREEPER_AMBIENT = VersionCompat.registerSound("entity.creeper.ambient");
 
     public static void register() {
         Main.LOGGER.info("[" + Main.MOD_NAME + "] Registering Sound Events...");
-    }
-
-    private static SoundEvent registerSound(String name) {
-
-        Identifier id = Identifier.fromNamespaceAndPath("plaguesnoisycreepers", name);
-
-        return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
     }
 
 }
