@@ -41,7 +41,8 @@ public class MixinCreeper {
     }
 
     @Unique
-    public void makeSound(final @Nullable SoundEvent sound) {
+    public void playAmbientSound() {
+        SoundEvent sound = this.getAmbientSound();
         if (sound != null) {
             Creeper creeper = (Creeper) (Object) this;
             creeper.playSound(sound, Main.getConfig().getAmbientVolume() * 2.0F, creeper.getVoicePitch());
